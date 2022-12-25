@@ -13,7 +13,7 @@ Requires `python3.7+`
 To install with pip, run:
 
 ```
-python3 install git+https://github.com/seanbreckenridge/active_window
+python3 -m pip install git+https://github.com/seanbreckenridge/active_window
 ```
 
 ## Usage
