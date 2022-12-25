@@ -49,7 +49,6 @@ def parse_window_events(
     if pth.suffix == ".csv":
         yield from _parse_csv_events(pth)
     else:
-        assert pth.suffix == ".json"
         yield from _parse_json_events(pth)
 
 
