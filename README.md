@@ -6,6 +6,8 @@ library to parse:
 - JSON export from activitywatch app for your computer
 - CSV files from my aw-window fork [(window_watcher)](https://github.com/seanbreckenridge/aw-watcher-window)
 
+To get those, go to the [raw data page](https://docs.activitywatch.net/en/latest/features/exporting-data.html) and download the JSON dump. That is what this takes as input
+
 ## Installation
 
 Requires `python3.7+`
