@@ -28,6 +28,15 @@ Options:
   --help      Show this message and exit.
 ```
 
+To use from python:
+
+```python
+from pathlib import Path
+from active_window.parse import parse_window_events
+
+data = list(parse_window_events(Path("./file.json")))
+```
+
 ### Tests
 
 ```bash
