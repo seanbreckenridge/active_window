@@ -1,5 +1,6 @@
 import json
 import csv
+import logging
 from io import StringIO
 from pathlib import Path
 from typing import NamedTuple, Union, Iterator
@@ -44,10 +45,10 @@ class AWWindowWatcherEvent(NamedTuple):
 
 
 def parse_window_events(
-    pth: Path,
+    pth: Path, logger: logging.Logger
 ) -> Iterator[Union[AWWindowWatcherEvent, AWAndroidEvent, AWComputerEvent]]:
     if pth.suffix == ".csv":
-        yield from _parse_csv_events(pth)
+        yield from _parse_csv_events(pth, logger=logger)
     else:
         yield from _parse_json_events(pth)
 
@@ -56,7 +57,9 @@ def _parse_datetime_sec(d: Union[str, float, int]) -> datetime:
     return datetime.fromtimestamp(int(d), tz=timezone.utc)
 
 
-def _parse_csv_events(pth: Path) -> Iterator[AWWindowWatcherEvent]:
+def _parse_csv_events(
+    pth: Path, logger: logging.Logger
+) -> Iterator[AWWindowWatcherEvent]:
     with pth.open("r", encoding="utf-8", newline="") as f:
         contents = f.read()
     # convert line breaks to unix style; i.e. broken ^M characters
@@ -64,6 +67,7 @@ def _parse_csv_events(pth: Path) -> Iterator[AWWindowWatcherEvent]:
     csv_reader = csv.reader(
         buf, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL
     )
+    row = None
     while True:
         try:
             row = next(csv_reader)
@@ -73,14 +77,16 @@ def _parse_csv_events(pth: Path) -> Iterator[AWWindowWatcherEvent]:
                 app=row[2],
                 title=row[3],
             )
-        except csv.Error:
+        except ValueError as ve:
+            logger.debug(f'Error parsing "{pth}" {row} {ve}')
+        except csv.Error as e:
             # some lines contain the NUL byte for some reason... ??
             # seems to be x-lib/encoding errors causing malformed application/file names
             # catch those and ignore them
             #
             # seems to happen when computer force shuts down/x-server doesnt have a chance
             # to stop properly
-            pass
+            logger.debug(f'Error parsing "{pth}" {row} {e}')
         except StopIteration:
             return
 
