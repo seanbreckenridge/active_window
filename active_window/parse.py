@@ -3,7 +3,7 @@ import csv
 import logging
 from io import StringIO
 from pathlib import Path
-from typing import NamedTuple, Union, Iterator
+from typing import NamedTuple, Union, Iterator, Optional
 from datetime import datetime, timezone
 
 import more_itertools
@@ -45,7 +45,7 @@ class AWWindowWatcherEvent(NamedTuple):
 
 
 def parse_window_events(
-    pth: Path, logger: logging.Logger
+    pth: Path, logger: Optional[logging.Logger] = None
 ) -> Iterator[Union[AWWindowWatcherEvent, AWAndroidEvent, AWComputerEvent]]:
     if pth.suffix == ".csv":
         yield from _parse_csv_events(pth, logger=logger)
@@ -58,7 +58,7 @@ def _parse_datetime_sec(d: Union[str, float, int]) -> datetime:
 
 
 def _parse_csv_events(
-    pth: Path, logger: logging.Logger
+    pth: Path, logger: Optional[logging.Logger]
 ) -> Iterator[AWWindowWatcherEvent]:
     with pth.open("r", encoding="utf-8", newline="") as f:
         contents = f.read()
@@ -78,7 +78,8 @@ def _parse_csv_events(
                 title=row[3],
             )
         except ValueError as ve:
-            logger.debug(f'Error parsing "{pth}" {row} {ve}')
+            if logger:
+                logger.debug(f'Error parsing "{pth}" {row} {ve}')
         except csv.Error as e:
             # some lines contain the NUL byte for some reason... ??
             # seems to be x-lib/encoding errors causing malformed application/file names
@@ -86,7 +87,8 @@ def _parse_csv_events(
             #
             # seems to happen when computer force shuts down/x-server doesnt have a chance
             # to stop properly
-            logger.debug(f'Error parsing "{pth}" {row} {e}')
+            if logger:
+                logger.debug(f'Error parsing "{pth}" {row} {e}')
         except StopIteration:
             return
 
