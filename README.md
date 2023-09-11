@@ -30,7 +30,7 @@ Options:
   --help      Show this message and exit.
 ```
 
-To use from python:
+To use from `python`:
 
 ```python
 from pathlib import Path
