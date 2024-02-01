@@ -3,10 +3,19 @@ import csv
 import logging
 from io import StringIO
 from pathlib import Path
-from typing import NamedTuple, Union, Iterator, Optional
+from typing import NamedTuple, Union, Iterator, Optional, Literal
 from datetime import datetime, timezone
 
 import more_itertools
+
+
+class AWParserError(ValueError):
+    def __init__(self, msg: str, path: Path) -> None:
+        super().__init__(msg)
+        self.path = path
+
+
+ErrorPolicy = Literal["raise", "drop"]
 
 
 class AWAndroidEvent(NamedTuple):
@@ -45,10 +54,12 @@ class AWWindowWatcherEvent(NamedTuple):
 
 
 def parse_window_events(
-    pth: Path, logger: Optional[logging.Logger] = None
+    pth: Path,
+    logger: Optional[logging.Logger] = None,
+    error_policy: ErrorPolicy = "drop",
 ) -> Iterator[Union[AWWindowWatcherEvent, AWAndroidEvent, AWComputerEvent]]:
     if pth.suffix == ".csv":
-        yield from _parse_csv_events(pth, logger=logger)
+        yield from _parse_csv_events(pth, logger=logger, error_policy=error_policy)
     else:
         yield from _parse_json_events(pth)
 
@@ -58,7 +69,9 @@ def _parse_datetime_sec(d: Union[str, float, int]) -> datetime:
 
 
 def _parse_csv_events(
-    pth: Path, logger: Optional[logging.Logger]
+    pth: Path,
+    logger: Optional[logging.Logger],
+    error_policy: ErrorPolicy = "drop",
 ) -> Iterator[AWWindowWatcherEvent]:
     with pth.open("r", encoding="utf-8", newline="") as f:
         contents = f.read()
@@ -78,6 +91,8 @@ def _parse_csv_events(
                 title=row[3],
             )
         except ValueError as ve:
+            if error_policy == "raise":
+                raise AWParserError(f"Error parsing {pth} {row} {ve}", pth) from ve
             if logger:
                 logger.debug(f'Error parsing "{pth}" {row} {ve}')
         except csv.Error as e:
@@ -87,6 +102,8 @@ def _parse_csv_events(
             #
             # seems to happen when computer force shuts down/x-server doesnt have a chance
             # to stop properly
+            if error_policy == "raise":
+                raise AWParserError(f"Error parsing {pth} {row} {e}", pth) from e
             if logger:
                 logger.debug(f'Error parsing "{pth}" {row} {e}')
         except StopIteration:
