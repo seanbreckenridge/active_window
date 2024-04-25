@@ -58,7 +58,7 @@ def parse_window_events(
     logger: Optional[logging.Logger] = None,
     error_policy: ErrorPolicy = "drop",
 ) -> Iterator[Union[AWWindowWatcherEvent, AWAndroidEvent, AWComputerEvent]]:
-    if pth.suffix == ".csv":
+    if pth.name.endswith(".csv") or ".csv." in pth.name:  # support compressed files
         yield from _parse_csv_events(pth, logger=logger, error_policy=error_policy)
     else:
         yield from _parse_json_events(pth)
