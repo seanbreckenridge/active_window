@@ -65,7 +65,7 @@ def parse_window_events(
 
 
 def _parse_datetime_sec(d: Union[str, float, int]) -> datetime:
-    return datetime.fromtimestamp(int(d), tz=timezone.utc)
+    return datetime.fromtimestamp(int(float(d)), tz=timezone.utc)
 
 
 def _parse_csv_events(
