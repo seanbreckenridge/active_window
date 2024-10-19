@@ -100,7 +100,7 @@ def _parse_csv_events(
             # seems to be x-lib/encoding errors causing malformed application/file names
             # catch those and ignore them
             #
-            # seems to happen when computer force shuts down/x-server doesnt have a chance
+            # seems to happen when computer force shuts down/x-server doesn't have a chance
             # to stop properly
             if error_policy == "raise":
                 raise AWParserError(f"Error parsing {pth} {row} {e}", pth) from e
@@ -119,7 +119,7 @@ def _parse_json_events(pth: Path) -> Iterator[Union[AWAndroidEvent, AWComputerEv
     data = json.loads(pth.read_text())
     buckets = data["buckets"]
     for val in buckets.values():
-        # check if this doesnt match schema
+        # check if this doesn't match schema
         if "events" not in val:
             continue
         first = more_itertools.first(val["events"], None)
