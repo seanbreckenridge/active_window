@@ -4,7 +4,7 @@ library to parse:
 
 - JSON export from activitywatch app for your phone
 - JSON export from activitywatch app for your computer
-- CSV files from my aw-window fork [(window_watcher)](https://github.com/seanbreckenridge/aw-watcher-window)
+- CSV files from my aw-window fork [(window_watcher)](https://github.com/purarue/aw-watcher-window)
 
 To get those, go to the [raw data page](https://docs.activitywatch.net/en/latest/features/exporting-data.html) and download the JSON dump. That is what this takes as input
 
@@ -15,7 +15,7 @@ Requires `python3.7+`
 To install with pip, run:
 
 ```
-python3 -m pip install git+https://github.com/seanbreckenridge/active_window
+python3 -m pip install git+https://github.com/purarue/active_window
 ```
 
 ## Usage
@@ -42,7 +42,7 @@ data = list(parse_window_events(Path("./file.json")))
 ### Tests
 
 ```bash
-git clone 'https://github.com/seanbreckenridge/active_window'
+git clone 'https://github.com/purarue/active_window'
 cd ./active_window
 pip install '.[testing]'
 flake8 ./active_window

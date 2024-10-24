@@ -44,7 +44,7 @@ class AWComputerEvent(NamedTuple):
 class AWWindowWatcherEvent(NamedTuple):
     """
     parsed from CSV files
-    https://github.com/seanbreckenridge/aw-watcher-window
+    https://github.com/purarue/aw-watcher-window
     """
 
     timestamp: datetime
