@@ -76,7 +76,8 @@ def _parse_csv_events(
     with pth.open("r", encoding="utf-8", newline="") as f:
         contents = f.read()
     # convert line breaks to unix style; i.e. broken ^M characters
-    buf = StringIO(contents.replace("\r", ""))
+    # remove NUL bytes
+    buf = StringIO(contents.replace("\r", "").replace("\0", ""))
     csv_reader = csv.reader(
         buf, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL
     )
